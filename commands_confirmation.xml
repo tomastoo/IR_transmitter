@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<tvs>
+  <chosen_tv>BE43T-H</chosen_tv>
+  <BE43T-H>
+    <LIRC_remote>Samsung_BN59-01175B</LIRC_remote>
+    <confirmation_codes>
+      <command name = "KEY_POWER" toggle = "true">
+        <toggle_option name = "on">boot reason</toggle_option>
+        <toggle_option name = "off">panel dpms: off</toggle_option>
+      </command>
+      <command name = "KEY_SOURCE" toggle = "false">0x000001</command>
+      <command name = "KEY_OK" toggle = "false">0x000068</command>
+      <command name = "KEY_LEFT" toggle = "false">0x000065</command>
+      <command name = "KEY_RIGHT" toggle = "false">0x000062</command>
+      <command name = "KEY_MUTE" toggle = "false">0x00000F</command>
+      <command name = "KEY_VOLUMEUP" toggle = "false">0x000007</command>
+      <command name = "KEY_VOLUMEDOWN" toggle = "false">0x00000B</command>
+    </confirmation_codes>
+    <TV_State>
+      <source name = "HDMI_1">0x80001</source>
+      <source name = "TV">0x30000</source>
+    </TV_State>
+    <logical_codes>
+      <command name = "HDMI_1" type = "source">
+        <from name = "TV">KEY_SOURCE:KEY_RIGHT:KEY_OK</from>
+        <from name = "HDMI_1"></from>
+      </command>
+      <command name = "TV" type = "source">
+        <from name = "HDMI_1">KEY_SOURCE:KEY_LEFT:KEY_OK</from>
+        <from name = "TV"></from>
+      </command>
+    </logical_codes>
+    <usb_serial_skip>
+      <line>[HDMIDRV]PortA CLK Unstable. Restart EQ Flow</line>
+    </usb_serial_skip>
+  </BE43T-H>
+</tvs>
