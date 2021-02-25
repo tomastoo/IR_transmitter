@@ -41,10 +41,6 @@ def get_confirm_code(command_name, config_xml):
     raise Exception('Confirmation code not found in pulga_ir_config.xml for command ' + command_name)
 
 
-def config_schedule_parser():
-    print()
-
-
 # send_command --> sends IR command, repeats until usb serial confirmation
 # returns bool:
 #        true --> command send successfully and confirmation received
@@ -57,8 +53,6 @@ def send_command(lirc_client, serial_socket, config_xml, command, toggle_option=
     remote = get_remote_name(config_xml)
     usb_serial_skip_lines = get_skip_lines()
     confirm_code = get_confirm_code(command, config_xml)
-    source_confirm = ""
-    source_line = ""
 
     toggle_wanted_confirmation = ''
     toggle_unwanted_confirmation = ''
@@ -93,7 +87,7 @@ def send_command(lirc_client, serial_socket, config_xml, command, toggle_option=
                     # if it is not a toggle we just want to search for the confirmation code
                     if isinstance(confirm_code, str):
                         if confirm_code in line_string:
-                            time.sleep(0.5)
+                            time.sleep(delays_and_tries["command_delay"])
                             return True
                         else:
                             print(line_string)
@@ -233,6 +227,46 @@ def change_source(source, config_xml, serial_socket, lirc_client):
         for command in command_sequence_list:
             send_command(lirc_client, serial_socket, config_xml, command)
 
+# arg command_type can only be sequece or power
+def find_command_sequence(command_name, config_xml, command_type):
+    logical_commands = config_xml.find("logical_commands")
+
+    try:
+        for command in logical_commands:
+            if command.get('type') == command_type and command.get('name') == command_name:
+                return command.text
+
+    except Exception as instance:
+        print(instance)
+
+
+#checks if the command is an original command from the tv remote
+def get_command_type(command_name, config_xml):
+    commands = config_xml.find('logical_commands').findall("command")
+    for command in commands:
+        if command.get('name') == command_name:
+            return command.get('type')
+
+    return "original"
+
+
+def send_command_sequence(command_name, config_xml, lirc_client, serial_socket):
+    command_sequence = find_command_sequence(command_name, config_xml, "sequence")
+    command_sequence = command_sequence.split(':')
+
+    for command in command_sequence:
+        command_type = get_command_type(command, config_xml)
+
+        if command_type == "original":
+            send_command(lirc_client, serial_socket, config_xml, command)
+
+        elif command_type == "source":
+            change_source(command, config_xml, serial_socket, lirc_client)
+
+        elif command_type == "power":
+            toggle_option = find_command_sequence(command, config_xml, "power")
+            send_command(lirc_client, serial_socket, config_xml, command, toggle_option=toggle_option)
+
 
 def get_remote_name(config_xml):
     return config_xml.find('LIRC_remote').text
@@ -242,16 +276,50 @@ def get_remote_name(config_xml):
 def get_delay_and_tries(config_xml):
     delays_and_tries = {}
 
-    delays_and_tries.update({"toggle_delay": int(config_xml.find('toggle_delay').text)})
+    delays_and_tries.update({"toggle_delay": int(config_xml.find('power_delay').text)})
     delays_and_tries.update({"ir_tries": int(config_xml.find('ir_tries').text)})
     delays_and_tries.update({"serial_tries": int(config_xml.find('serial_tries').text)})
+
+    command_delay = config_xml.find('command_delay').text
+    if "." in command_delay:
+        command_delay = float(command_delay)
+    else:
+        command_delay = int(command_delay)
+
+    delays_and_tries.update({"command_delay": command_delay})
 
     return delays_and_tries
 
 
+def schedule(lirc_client, serial, tv_config_root):
+    schedule_config_cooperation = tv_config_root.find('schedule_config_cooperation')
+
+    source_aliases = schedule_config_cooperation.find('source_aliases').findall('alias')
+
+    paths = schedule_config_cooperation.find('paths')
+
+    all_schedules_path = paths.find('all_elements').text
+    all_schedules_path = all_schedules_path.split(':')
+
+    source_path = paths.find('source').text
+    source_path = source_path.split(':')
+
+    schedule_start_path = paths.find('schedule_start')
+    schedule_start_path = schedule_start_path.split(':')
+
+    schedule_end_path = paths.find('schedule_end')
+    schedule_end_path = schedule_end_path.split(':')
+
+
+
+    tree = ET.parse("shedule.xml")
+    root = tree.getroot()
+
+
 def test(lirc_client, serial_socket, config_xml):
-    send_command(lirc_client, serial_socket, config_xml, command="KEY_POWER", toggle_option='off')
-    #change_source('HDMI_1', config_xml, serial_socket, lirc_client)
+    #send_command(lirc_client, serial_socket, config_xml, command="KEY_POWER", toggle_option='off')
+    #change_source('TV', config_xml, serial_socket, lirc_client)
+    send_command_sequence("SEQ_1", config_xml, lirc_client, serial_socket)
 
 
 def main():

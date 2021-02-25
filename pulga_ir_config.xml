@@ -1,6 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+
 <tvs>
   <chosen_tv>BE43T-H</chosen_tv>
+  <schedule_config_cooperation>
+    <paths>
+      <all_elements>Media:Layer</all_elements>
+      <source>Filename</source>
+      <power>MonitorState</power>
+      <schedule_start>StartDate</schedule_start>
+      <schedule_end>EndDate</schedule_end>
+    </paths>
+    <command_aliases>
+      <alias type="source" name = "HDMI_1">.ini</alias>
+      <alias type="source" name = "TV">.tv</alias>
+    </command_aliases>
+  </schedule_config_cooperation>
   <usb_serial>
     <port>COM6</port>
     <baud_rate>115200</baud_rate>
@@ -12,7 +26,8 @@
   </lirc>
   <BE43T-H>
     <LIRC_remote>Samsung_BN59-01175B</LIRC_remote>
-    <toggle_delay>10</toggle_delay>
+    <power_delay>10</power_delay>
+    <command_delay>0.5</command_delay>
     <ir_tries>5</ir_tries>
     <serial_tries>500</serial_tries>
     <confirmation_codes>
@@ -43,6 +58,9 @@
       <command name = "TV" type = "source">
         <from name = "HDMI_1">KEY_SOURCE:KEY_LEFT:KEY_OK</from>
       </command>
+      <command name = "KEY_ON" type = "power">on</command>
+      <command name = "KEY_OFF" type = "power">off</command>
+      <command name = "SEQ_1" type = "sequence">KEY_MUTE:KEY_MUTE:KEY_VOLUMEUP:KEY_VOLUMEDOWN</command>
     </logical_commands>
     <usb_serial_skip>
       <line>[HDMIDRV]PortA CLK Unstable. Restart EQ Flow</line>
