@@ -2,19 +2,6 @@
 
 <tvs>
   <chosen_tv>BE43T-H</chosen_tv>
-  <schedule_config_cooperation>
-    <paths>
-      <all_elements>Media:Layer</all_elements>
-      <source>Filename</source>
-      <power>MonitorState</power>
-      <schedule_start>StartDate</schedule_start>
-      <schedule_end>EndDate</schedule_end>
-    </paths>
-    <command_aliases>
-      <alias type="source" name = "HDMI_1">.ini</alias>
-      <alias type="source" name = "TV">.tv</alias>
-    </command_aliases>
-  </schedule_config_cooperation>
   <usb_serial>
     <port>COM6</port>
     <baud_rate>115200</baud_rate>
@@ -30,6 +17,21 @@
     <command_delay>0.5</command_delay>
     <ir_tries>5</ir_tries>
     <serial_tries>500</serial_tries>
+    <schedule_config_cooperation>
+      <paths>
+        <all_elements>Media/Layer</all_elements>
+        <source>Filename</source>
+        <power>MonitorState</power>
+        <schedule_start>StartDate</schedule_start>
+        <schedule_end>EndDate</schedule_end>
+      </paths>
+      <command_aliases>
+        <alias type="source" logical_name = "HDMI_1">.ini</alias>
+        <alias type="source" logical_name = "TV">.tv</alias>
+        <alias type="power" logical_name="KEY_ON">True</alias>
+        <alias type="power" logical_name="KEY_OFF">False</alias>
+      </command_aliases>
+    </schedule_config_cooperation>
     <confirmation_codes>
       <command name = "KEY_POWER" toggle = "true">
         <toggle_option name = "on">boot reason</toggle_option>
@@ -49,6 +51,7 @@
         <confirmation>SOURCE[</confirmation>
       </get_source>
       <source name = "HDMI_1">0x80001</source>
+      <source name = "HDMI_2">0x80002</source>
       <source name = "TV">0x30000</source>
     </TV_State>
     <logical_commands>

@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ScheduleZone xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <ShopFolder>MarShopping</ShopFolder>
+  <ChannelFolder>BalcaoInformacoes</ChannelFolder>
+  <ZoneFolder>Centro Comercial</ZoneFolder>
+  <ChannelZoneId>4</ChannelZoneId>
+  <Media>
+    <Layer>
+      <ID>1</ID>
+      <AreaId>1</AreaId>
+      <Name>Balcão de Informações - OFF</Name>
+      <Filename>MarShopping_2_Balcao_de_Informacoes_00_00_00.ini</Filename>
+      <MonitorState>True</MonitorState>
+      <StartDate>11:00:00</StartDate>
+      <EndDate>12:13:00</EndDate>
+    </Layer>
+    <Layer>
+      <ID>2</ID>
+      <AreaId>1</AreaId>
+      <Name>Balcão de Informações - Grelha Mar Shopping</Name>
+      <Filename>MarShopping_3_Balcao_de_Informacoes_08_50_00.ini</Filename>
+      <MonitorState>True</MonitorState>
+      <StartDate>12:13:00</StartDate>
+      <EndDate>12:14:00</EndDate>
+    </Layer>
+    <Layer>
+      <ID>2</ID>
+      <AreaId>1</AreaId>
+      <Name>Balcão de Informações - Grelha Mar Shopping</Name>
+      <Filename>MarShopping_3_Balcao_de_Informacoes_08_50_00.ini</Filename>
+      <MonitorState>False</MonitorState>
+      <StartDate>12:14:00</StartDate>
+      <EndDate>22:59:00</EndDate>
+    </Layer>
+  </Media>
+  <Commands>
+    <StartCommandInfo>
+      <StartCommand>false</StartCommand>
+      <Ficheiro>MarShopping_3_Balcao_de_Informacoes_08_50_00.ini</Ficheiro>
+    </StartCommandInfo>
+    <StopCommand>false</StopCommand>
+    <AdiaCommand>false</AdiaCommand>
+    <AntecipaCommand>false</AntecipaCommand>
+    <ResetCommand>true</ResetCommand>
+    <ResetActualCommand>false</ResetActualCommand>
+  </Commands>
+  <PeriodoActivo>2</PeriodoActivo>
+  <LastWrite>2015-07-28T16:00:51.9298414+01:00</LastWrite>
+</ScheduleZone>

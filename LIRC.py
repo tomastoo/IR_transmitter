@@ -4,7 +4,7 @@ import serial
 import xml.etree.ElementTree as ET
 import time
 import pause
-
+from datetime import datetime
 
 def get_lirc_client(ip, port, timeout):
     client = lirc.Client(
@@ -291,29 +291,64 @@ def get_delay_and_tries(config_xml):
     return delays_and_tries
 
 
-def schedule(lirc_client, serial, tv_config_root):
-    schedule_config_cooperation = tv_config_root.find('schedule_config_cooperation')
+def schedule(lirc_client, serial_socket, config_xml):
+    schedule_config_cooperation = config_xml.find('schedule_config_cooperation')
 
-    source_aliases = schedule_config_cooperation.find('source_aliases').findall('alias')
+    command_aliases = schedule_config_cooperation.find('command_aliases').findall('alias')
 
     paths = schedule_config_cooperation.find('paths')
 
     all_schedules_path = paths.find('all_elements').text
-    all_schedules_path = all_schedules_path.split(':')
-
     source_path = paths.find('source').text
-    source_path = source_path.split(':')
+    schedule_start_path = paths.find('schedule_start').text
+    schedule_end_path = paths.find('schedule_end').text
+    power_path = paths.find('power').text
 
-    schedule_start_path = paths.find('schedule_start')
-    schedule_start_path = schedule_start_path.split(':')
-
-    schedule_end_path = paths.find('schedule_end')
-    schedule_end_path = schedule_end_path.split(':')
-
-
-
-    tree = ET.parse("shedule.xml")
+    tree = ET.parse("schedule.xml")
     root = tree.getroot()
+    all_layers = root.findall(all_schedules_path)
+    i = 0
+    while i < len(all_layers):
+        layer = all_layers[i]
+        date_time = datetime.now()
+
+        schedule_start = datetime.strptime(layer.find(schedule_start_path).text, '%X')
+        schedule_start = schedule_start.replace(year=date_time.year, month=date_time.month, day=date_time.day)
+
+        schedule_end = datetime.strptime(layer.find(schedule_end_path).text, '%X')
+        schedule_end = schedule_end.replace(year=date_time.year, month=date_time.month, day=date_time.day)
+
+        power = layer.find(power_path).text
+        source = layer.find(source_path).text
+
+        if schedule_start <= date_time < schedule_end:
+            #on = False
+            #execute commands
+            on = None
+            for alias in command_aliases:
+                if alias.get('type') == "power" and alias.text == power:
+                    toggle_option = find_command_sequence(alias.get('logical_name'), config_xml, "power")
+                    if toggle_option == "off":
+                        send_command(lirc_client, serial_socket, config_xml, "KEY_POWER"
+                                     , toggle_option=toggle_option)
+                        on = False
+                    else:
+                        on = True
+                        break
+
+            if on is None:
+                raise Exception("Bad config")
+            if on:
+                for alias in command_aliases:
+                    if alias.get('type') == "source" and alias.text in source:
+                        change_source(alias.get('logical_name'), config_xml, serial_socket, lirc_client)
+
+            pause.until(schedule_end)
+
+        if i == len(all_layers) - 1:
+            i = 0
+        else:
+            i += 1
 
 
 def test(lirc_client, serial_socket, config_xml):
@@ -338,7 +373,7 @@ def main():
     ser = serial.Serial(com_port, baud_rate)
     lirc_client = get_lirc_client(lirc_ip, lirc_port, lirc_timeout)
 
-    test(lirc_client, ser, tv_config_xml)
+    schedule(lirc_client, ser, tv_config_xml)
     ser.close()
     # c = get_confirm_code('KEY_POWER')
 
